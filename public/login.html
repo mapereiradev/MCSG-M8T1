@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login with 2FA</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-container {
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      text-align: left;
+      color: #555;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    .btn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .submitbtn {
+      background: #3498db;
+    }
+
+    .submitbtn:hover {
+      background: #2980b9;
+    }
+
+    .volverbtn {
+      background: #2fa72b;
+    }
+    .volverbtn:hover {
+      background: #088004;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Login con 2FA</h2>
+    <form method="POST" action="/login">
+      <label for="numberCode">Código de 6 dígitos:</label>
+      <input type="text" id="numberCode" name="numberCode" pattern="\\d{6}" maxlength="6" required placeholder="Introduce tu código de 6 dígitos">
+
+      <label for="secret">Secreto:</label>
+      <input type="text" id="secret" name="secret" required placeholder="Introduce el secreto">
+
+      <button class="btn submitbtn" type="button" id="submitbtn">Verificar</button>
+      <button class="btn volverbtn" id='volverbtn' href='${window.location.origin}/index.html'>Volver</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+      document.getElementById('volverbtn').addEventListener('click', () => {
+        window.location = `${window.location.origin}/index.html`
+      })
+      document.getElementById('submitbtn').addEventListener('click', async (e) => {
+        e.preventDefault();
+        const numberCode = e.target.form[0].value;
+        const secret = e.target.form[1].value;
+      try {
+        if (numberCode === null || numberCode === '' || isNaN(numberCode)) {
+          throw new Error('Debes introducir un código numérico.');
+        }
+        if (secret === null || secret === '') {
+          throw new Error('Debes introducir el secreto.');
+        }
+        const response = await fetch('http://localhost:3000/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              numberCode: numberCode,
+              secret: secret
+          })
+        });
+
+        const data = await response.json();
+        document.getElementById('result').innerHTML =
+          `<p style="color: ${data.color};"><strong>${data.message}</strong></p>`;
+
+      } catch (error) {
+        document.getElementById('result').innerHTML = (error) ?
+          `<p style="color: red;"><strong>${error}</strong></p>`
+          : `<p style="color: red;"><strong>No se ha podido verificar el código QR</strong></p>`;
+      }
+    });
+    </script>
+  </div>
+</body>
+</html>

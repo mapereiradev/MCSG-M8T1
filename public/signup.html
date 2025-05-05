@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registra un código</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .form-container {
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      text-align: center;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      color: #555;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      border-radius: 5px;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .submitbtn {
+      background: #3498db;
+    }
+
+    .submitbtn:hover {
+      background: #2980b9;
+    }
+
+    .volverbtn {
+      background: #2fa72b;
+    }
+
+    .volverbtn:hover {
+      background: #088004;
+    }
+    #result {
+      text-align: center;
+    }
+
+
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Crear nuevo código QR</h2>
+    <form>
+      <button class="btn submitbtn" id="generateQR_button">Generar QR</button>
+      <button class="btn volverbtn" id="volver">Volver</button>
+    </form>
+      <div id="result"></div>
+      <script>
+      document.getElementById('volver').addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = `${window.location.origin}/index.html`;
+      });
+
+      document.getElementById('generateQR_button').addEventListener('click', async (e) => {
+      e.preventDefault();
+
+      try {
+        const response = await fetch('http://localhost:3000/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            secretLength: 20
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Error de red. No se pudo generar el código QR.');
+        }
+
+        const data = await response.json();
+
+        document.getElementById('result').innerHTML = `
+          <img src="${data.qrCode}" alt="QR Code" width="200" height="200" />
+          <p>Secreto: <strong>${data.secret}</strong></p>
+        `;
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('result').innerHTML = `<p style="color:red;">${error}</p>`;
+      }
+    });
+
+      </script>
+  </div>
+</body>
+</html>
