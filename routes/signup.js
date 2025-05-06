@@ -17,6 +17,7 @@ const signup = async (req, res) => {
       qrCode: qrCodeDataURL,
       secret: secret.base32
     });
+    console.log(secret.otpauth_url);
   } catch (err) {
     console.error("Error generating QR code:", err);
     res.status(500).json({ error: "Internal Server Error" });
