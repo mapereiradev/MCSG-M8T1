@@ -11,5 +11,5 @@ npm install
 ```
 #### 3) Para ejecutar la aplicación lanzamos el siguiente comando:
 ```
-node app.ja
+node app.js
 ```
